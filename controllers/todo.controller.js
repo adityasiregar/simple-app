@@ -1,37 +1,40 @@
 const fs = require('fs')
+const db = require("../config/db");
 
 const DATA_FILE = __dirname + '/../models/data.json'
-const getToDo = (req, res) => {
-    fs.readFile(DATA_FILE, 'utf8', (err, data) => {
-        if (err) {
-          console.error(err);
-          return res.send({
-              message: "Error"
-          })        
-        }
-        res.json(JSON.parse(data))
+
+const getToDo = async (req, res) => {
+    await db
+    .query("select * from todos")
+    .then((result) => {
+        res.status(200).json({
+        data: result.rows,
+        });
+    })
+    .catch((e) => {
+        console.log(e);
+        res.status(500).json({
+        message: "INTERNAL SERVER ERROR",
+        });
     });
 }
 
-const postToDo = (req, res) => {
+const postToDo = async (req, res) => {
     const body = req.body;
 
-    let data = fs.readFileSync(DATA_FILE, {})
-    data = JSON.parse(data)
-    data.push(body)    
-
-    fs.writeFile(DATA_FILE, JSON.stringify(data), err => {
-        if(err) {
-            return res.send({
-                message: "Error Write File"
-            })    
-        }
-
-        res.json({
-            message: "Data successfuly created",
-            data: data
-        })
+    await db
+    .query(`insert into todos(name, done) values ('${body.name}', ${body.done})`)
+    .then((result) => {
+        res.status(200).json({
+        message: 'Todo successfully created',
+        });
     })
+    .catch((e) => {
+        console.log(e);
+        res.status(500).json({
+        message: "INTERNAL SERVER ERROR",
+        });
+    });
 };
 
 module.exports = {

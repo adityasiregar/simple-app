@@ -1,5 +1,5 @@
 
-const { User } = require('../models/index')
+const { User, Photo } = require('../models/index')
 
 const create = async (req, res) => {
     const body = req.body;
@@ -15,6 +15,30 @@ const create = async (req, res) => {
         res.status(200).send({
             status: "SUCCESS",
             message:"User berhasil dibuat",
+            data: user
+        })
+    }).catch(e => {
+        console.log(e)
+        res.status(503).send({
+            status:"FAIL",
+            message: "Gagal membuat user"
+        })
+    })
+};
+
+const findOne = async (req, res) => {
+    return User.findOne({
+        where: {
+            id: req.params.id
+        },
+        include: {
+            model: Photo,
+            as: "photos"
+        }
+    }).then(user => {
+        res.status(200).send({
+            status: "SUCCESS",
+            message:"User",
             data: user
         })
     }).catch(e => {
@@ -67,6 +91,7 @@ const findByEmail = async (req, res) => {
 
 module.exports = {
     create,
+    findOne,
     findByEmail,
     findAll
 }

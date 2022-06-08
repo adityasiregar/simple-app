@@ -3,12 +3,10 @@ const { Photo } = require('../models/index')
 
 const create = async (req, res) => {
     const body = req.body;
-    const userId = body.userId
+    const userId = req.id
     const photoUrl = body.photoUrl;
     const caption = body.caption;
 
-    console.log("Hello Heloo");
-    
     return Photo.create({
         userId: userId,
         photoUrl: photoUrl,
